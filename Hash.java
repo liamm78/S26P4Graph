@@ -1,3 +1,5 @@
+package S26P4Graph;
+
 /**
  * Implement a hash table.
  * Data: Strings
