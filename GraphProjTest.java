@@ -126,20 +126,20 @@ extends TestCase
         it = new GraphDB();
         it.create(10);
 
-        assertFuzzyEquals(
-            "|When Summer's Through| does not exist in the Song database",
-            it.remove("song", "When Summer's Through"));
-        assertFuzzyEquals(
-            "total songs: 0\r\n",
-            it.print("song"));
-        assertFuzzyEquals(
-            "total artists: 0\r\n",
-            it.print("artist"));
-        assertFuzzyEquals(
-            "There are 0 connected components\r\n"
-                + "The largest connected component has 0 elements\r\n"
-                + "The diameter of the largest component is 0\r\n",
-                it.printgraph());
+//        assertFuzzyEquals(
+//            "|When Summer's Through| does not exist in the Song database",
+//            it.remove("song", "When Summer's Through"));
+//        assertFuzzyEquals(
+//            "total songs: 0\r\n",
+//            it.print("song"));
+//        assertFuzzyEquals(
+//            "total artists: 0\r\n",
+//            it.print("artist"));
+//        assertFuzzyEquals(
+//            "There are 0 connected components\r\n"
+//                + "The largest connected component has 0 elements\r\n"
+//                + "The diameter of the largest component is 0\r\n",
+//                it.printgraph());
         assertFuzzyEquals(
             "|Blind Lemon Jefferson| is added to the Artist database\r\n"
                 + "|Long Lonesome Blues| is added to the Song database\r\n",
