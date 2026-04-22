@@ -1,4 +1,4 @@
-package S26P4Graph;
+//package S26P4Graph;
 
 import java.io.IOException;
 
@@ -149,7 +149,7 @@ public class GraphDB implements GPInterface {
             .equals("")) {
             return "Input strings cannot be null or empty";
         }
-        if (!type.equals("song") || !type.equals("artist")) {
+        if (!type.equals("song") && !type.equals("artist")) {
             return "Bad type value |" + type + "| on remove";
         }
 
