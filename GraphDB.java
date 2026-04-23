@@ -103,8 +103,8 @@ public class GraphDB implements GPInterface {
 
         // If artist entry doesn't exist, create it. Otherwise use what's there
         if (artistIdx == -1) {
-            artistNode = graph.getNumEntries();
-            graph.setValue(artistNode, artistString);
+            artistNode = graph.addNode(artistString);
+            str += graph.getMessage();
             str += artistTable.insert(artistString, artistNode);
         }
         else {
@@ -113,8 +113,8 @@ public class GraphDB implements GPInterface {
 
         // If song entry dosn't exist, create it. Otherwise use what's there
         if (songIdx == -1) {
-            songNode = graph.getNumEntries();
-            graph.setValue(songNode, songString);
+            songNode = graph.addNode(songString);
+            str += graph.getMessage();
             str += songTable.insert(songString, songNode);
         }
         else {
@@ -147,11 +147,30 @@ public class GraphDB implements GPInterface {
             .equals("")) {
             return "Input strings cannot be null or empty";
         }
-        if (!type.equals("song") || !type.equals("artist")) {
+        if (!type.equals("song") && !type.equals("artist")) {
             return "Bad type value |" + type + "| on remove";
         }
 
-        return "Success";
+        Hash table = null;
+        String s = "";
+        if (type.equals("artist")) {
+            table = artistTable;
+            s = "Artist";
+        }
+        else if (type.equals("song")) {
+            table = songTable;
+            s = "Song";
+        }
+
+        int idx = table.get(nameString);
+        if (idx == -1) {
+            return "|" + nameString + "| does not exist in the " + s
+                + " database\r\n";
+        }
+        else {
+            return table.remove(idx, nameString);
+
+        }
     }
 
 
@@ -176,7 +195,7 @@ public class GraphDB implements GPInterface {
             return "Bad print parameter";
         }
         String str = "";
-        
+
         Hash table = null;
         if (type.equals("artist")) {
             table = artistTable;
@@ -187,12 +206,16 @@ public class GraphDB implements GPInterface {
 
         for (int i = 0; i < table.getHashSize(); i++) {
             int nodeVal = table.getTable()[i];
-            if(nodeVal != -1) {
-            String val = (String)graph.getValue(nodeVal);
-            str += i+": |"+val+"|\r\n";
+            if (nodeVal == -2) {
+                str += i + ": TOMBSTONE\r\n";
             }
+            else if (nodeVal != -1) {
+                String val = (String)graph.getValue(nodeVal);
+                str += i + ": |" + val + "|\r\n";
+            }
+
         }
-        str += "total "+type+"s: "+table.getOccupiedRecords()+"\r\n";
+        str += "total " + type + "s: " + table.getOccupiedRecords() + "\r\n";
         return str;
     }
 
@@ -204,6 +227,9 @@ public class GraphDB implements GPInterface {
      * @return The string that was printed
      */
     public String printgraph() {
-        return null;
+        ParPtrTree tree = new ParPtrTree(10);
+
+        return graph.getGraphInfo(tree);
+
     }
 }

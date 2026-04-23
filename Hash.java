@@ -46,14 +46,13 @@ public class Hash {
         int newHashSize = hashSize * 2;
         int[] newHash = new int[newHashSize];
         occupiedRecords = 0;
-        
+
         for (int i = 0; i < newHashSize; i++) {
             newHash[i] = EMPTY;
         }
 
         for (int i = 0; i < hashSize; i++) {
             int currentNode = this.hash[i];
-            
 
             if (currentNode != EMPTY && currentNode != TOMBSTONE) {
                 int anchorIdx = this.h((String)graph.getValue(currentNode),
@@ -181,10 +180,21 @@ public class Hash {
     }
 
 
+    public String remove(int idx, String s) {
+        int currVal = this.hash[idx];
+        hash[idx] = TOMBSTONE;
+                // Remove from graph
+        graph.removeNode(currVal);
+        occupiedRecords--;
+        return "|" + s + "| is removed from the " + name + " database";
+    }
+
+
     public int getHashSize() {
         return this.hashSize;
     }
-    
+
+
     public int getOccupiedRecords() {
         return this.occupiedRecords;
     }

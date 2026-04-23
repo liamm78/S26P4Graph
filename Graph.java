@@ -17,6 +17,9 @@ public class Graph {
     private Object[] nodeValues;
     private int numEdge;
     private int numEntries;
+    private int[] freeEntries;
+    private int freeCount;
+    private String lastMessage = "";
 
     // No real constructor needed
     Graph(int n) {
@@ -34,6 +37,8 @@ public class Graph {
         this.nodeValues = new Object[n];
         this.numEdge = 0;
         this.numEntries = 0;
+        this.freeEntries = new int[n]; // Stack
+        this.freeCount = 0;
     }
 
 
@@ -64,7 +69,6 @@ public class Graph {
      */
     public void setValue(int v, Object val) {
         nodeValues[v] = val;
-        numEntries++;
     }
 
 
@@ -128,6 +132,91 @@ public class Graph {
     }
 
 
+    /**
+     * Called when numEntries is full.
+     * 
+     * 
+     */
+    public String expandGraph() {
+        int newSize = nodeArray.length * 2;
+        Edge[] newNodeArray = new Edge[newSize];
+        Object[] newNodeValues = new Object[newSize];
+        int[] newFreeEntries = new int[newSize];
+        
+        // Blank slate
+        for (int i = 0; i < newSize; i++) {
+            newNodeArray[i] = new Edge(-1, -1, null, null);
+        }
+        for (int i = 0; i < nodeArray.length; i++) {
+            newNodeArray[i] = nodeArray[i];
+            newNodeValues[i]= nodeValues[i];
+        }
+        // Copy over free slots
+        for (int i = 0; i < freeEntries.length; i++) {
+            newFreeEntries[i] = freeEntries[i];
+        }
+        
+        this.nodeArray = newNodeArray;
+        this.nodeValues = newNodeValues;
+        this.freeEntries = newFreeEntries;
+        
+        return "Graph size doubled to "+newSize+"\r\n";
+    }
+
+    
+    public String getMessage() {
+        return this.lastMessage;
+    }
+
+    /**
+     * Check if there is a free spot, and use the
+     * 
+     * 
+     * @param v
+     */
+    public int addNode(String value) {
+        int node = 0;
+        // There is a free spot
+        if (freeCount > 0) {
+            freeCount--;
+            node = freeEntries[freeCount];
+        }
+        // Otherwise, try to insert at numEntries. but check if graph is full
+        else {
+            if (numEntries >= nodeArray.length) {
+                lastMessage = expandGraph();
+            }
+            node = numEntries;
+        }
+        setValue(node, value);
+        numEntries++;
+        return node;
+
+    }
+
+
+    public void removeNode(int v) {
+
+        // Remove edges going out from v
+        Edge curr = nodeArray[v].next;
+        while (curr != null) {
+            numEdge--;
+            curr = curr.next;
+        }
+        nodeArray[v].next = null;
+        // Remove edges coming into v
+        for (int i = 0; i < nodeArray.length; i++) {
+            if (i == v) {
+                removeEdge(i, v);
+            }
+        }
+        freeEntries[freeCount] = v;
+        freeCount++;
+        nodeValues[v] = null;
+        numEntries--;
+    }
+
+
     // Removes the edge from the graph.
     public void removeEdge(int v, int w) {
         Edge curr = find(v, w);
@@ -171,9 +260,12 @@ public class Graph {
      * 
      * @return
      */
-    public int getIslands() {
-        ParPtrTree tree = new ParPtrTree(nodeValues.length);
-        int islandCount = nodeValues.length;
+    public String getGraphInfo(ParPtrTree ptr) {
+        ParPtrTree tree = ptr;
+        int[] sizes = new int[nodeArray.length]; //
+        int maxCount = 0; // Max nodes for any islands
+        int numIslands = 0;
+
         // Loop over every vertex
         for (int i = 0; i < nodeArray.length; i++) {
             Edge curr = nodeArray[i].next; // Get the real edge past sentinnel
@@ -182,12 +274,122 @@ public class Graph {
                 int w = curr.vertex;
                 if (tree.FIND(v) != tree.FIND(w)) {
                     tree.UNION(v, w);
-                    islandCount--;
                 }
                 curr = curr.next;
             }
         }
-        return islandCount;
+
+        for (int i = 0; i < nodeArray.length; i++) {
+            if (getValue(i) != null) {
+                int root = tree.FIND(i);
+                sizes[root]++;
+
+                if (sizes[root] > maxCount) {
+                    maxCount = sizes[root];
+                }
+            }
+        }
+        for (int i = 0; i < sizes.length; i++) {
+            System.out.println(sizes[i]);
+        }
+        // Get num islands
+        for (int i = 0; i < sizes.length; i++) {
+            if (sizes[i] > 0) {
+                numIslands++;
+            }
+        }
+        // Run Floyd on every root to see the max diameters
+        int maxDiameter = 0;
+        for (int i = 0; i < sizes.length; i++) {
+            if (sizes[i] == maxCount) { // Check if this node leads to root i
+                System.out.println("New root " + i);
+
+                int[] currentIsland = new int[maxCount];
+                int c = 0;
+                for (int j = 0; j < nodeArray.length; j++) {
+                    if (getValue(j) != null && tree.FIND(j) == i) {
+                        currentIsland[c] = j;
+                        c++;
+                    }
+                }
+                int d = computeDiameter(currentIsland);
+                if (d > maxDiameter) {
+                    maxDiameter = d;
+                }
+
+            }
+        }
+
+        return "There are " + numIslands + " connected components\r\n"
+            + "The largest connected component has " + maxCount
+            + " elements\r\n" + "The diameter of the largest component is "
+            + maxDiameter + "\r\n";
+    }
+
+
+    /**
+     * Implements Floyds Algorithim
+     * Computes diameter
+     * 
+     * @param nodes
+     *            that are apart of this island
+     * @return
+     */
+    public int computeDiameter(int[] nodes) {
+        int n = nodes.length;
+        int[][] D = new int[n][n];
+        Graph G = this;
+
+        for (int i = 0; i < n; i++) { // Initialize D with weights
+            for (int j = 0; j < n; j++) {
+                if (i != j) {
+                    int w = G.weight(nodes[i], nodes[j]);
+                    if (w != 0) {
+                        D[i][j] = 1; // all edges have a weight of one
+                    }
+                    else {
+                        D[i][j] = Integer.MAX_VALUE;
+                    }
+                }
+                else {
+                    D[i][j] = 0;
+                }
+            }
+        }
+        System.out.println("D before floyds");
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                System.out.println(D[i][j]);
+            }
+        }
+        for (int k = 0; k < n; k++) { // Compute all k paths
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if ((D[i][k] != Integer.MAX_VALUE)
+                        && (D[k][j] != Integer.MAX_VALUE) && (D[i][j] > (D[i][k]
+                            + D[k][j]))) {
+                        D[i][j] = D[i][k] + D[k][j];
+                    }
+                }
+            }
+        }
+        System.out.println("D after floyds");
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                System.out.println(D[i][j]);
+            }
+        }
+
+        int diameter = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (D[i][j] != Integer.MAX_VALUE && D[i][j] > diameter) {
+                    diameter = D[i][j];
+                }
+            }
+        }
+        return diameter;
     }
 
 
