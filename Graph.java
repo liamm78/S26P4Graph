@@ -59,6 +59,11 @@ public class Graph {
     public Object getValue(int v) {
         return nodeValues[v];
     }
+    
+    // Return the current number of free spots
+    public int freeCount() {
+        return freeCount;
+    }
 
 
     /**
@@ -108,8 +113,10 @@ public class Graph {
             return;
         }
         Edge curr = find(v, w);
-        if ((curr.next != null) && (curr.next.vertex == w)) {
-            curr.next.weight = wgt;
+        if (curr.next != null) {
+            if(curr.next.vertex == w) {
+                curr.next.weight = wgt;
+            }
         }
         else {
             curr.next = new Edge(w, wgt, curr, curr.next);
@@ -221,7 +228,10 @@ public class Graph {
     // Removes the edge from the graph.
     public void removeEdge(int v, int w) {
         Edge curr = find(v, w);
-        if ((curr.next == null) || curr.next.vertex != w) {
+        if (curr.next == null) {
+            return;
+        }
+        if(curr.next.vertex != w) {
             return;
         }
         else {

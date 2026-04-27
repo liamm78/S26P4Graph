@@ -110,12 +110,12 @@ extends TestCase
             "total songs: 0",
             it.print("song"));
         it.insert("Hello World", "Hello World2");
-//        assertFuzzyEquals(
-//            "|Dum| does not exist in the Artist database",
-//            it.remove("artist", "Dum"));
-//        assertFuzzyEquals(
-//            "|Dum| does not exist in the song database",
-//            it.remove("song", "Dum"));
+        assertFuzzyEquals(
+            "|Dum| does not exist in the Artist database",
+            it.remove("artist", "Dum"));
+        assertFuzzyEquals(
+            "|Dum| does not exist in the song database",
+            it.remove("song", "Dum"));
     }
 
 
@@ -184,35 +184,35 @@ extends TestCase
                 + "19: |Long   Lonesome Blues|\r\n"
                 + "total songs: 6\r\n",
                 it.print("song"));
-//        assertFuzzyEquals(
-//            "There are 1 connected components\r\n"
-//                + "The largest connected component has 8 elements\r\n"
-//                + "The diameter of the largest component is 4\r\n",
-//                it.printgraph());
-//        assertFuzzyEquals(
-//            "|Sleepy| does not exist in the Song database\r\n",
-//            it.remove("song", "Sleepy"));
-//        assertFuzzyEquals(
-//            "|ma rainey| does not exist in the Artist database\r\n",
-//            it.remove("artist", "ma rainey"));
-//        assertFuzzyEquals(
-//            "|Ma Rainey| is removed from the Artist database\r\n",
-//            it.remove("artist", "Ma Rainey"));
-//        assertFuzzyEquals(
-//            "0: |Blind Lemon Jefferson|\r\n"
-//                + "7: TOMBSTONE\r\n"
-//                + "total artists: 1\r\n",
-//                it.print("artist"));
-//        assertFuzzyEquals(
-//            "|Barenaked Ladies| is added to the Artist database\r\n"
-//                + "|Sarah Yellin| is added to the Song database\r\n",
-//                it.insert("Barenaked Ladies", "Sarah Yellin"));
-//        assertFuzzyEquals(
-//            "|Gerard Lenorman| is added to the Artist database\r\n"
-//                + "Graph size doubled to 20\r\n"
-//                + "|Oversleeping| is added to the Song database",
-//                it.insert("Gerard Lenorman", "Oversleeping"));
-//        assertTrue(it.clear());
+        assertFuzzyEquals(
+            "There are 1 connected components\r\n"
+                + "The largest connected component has 8 elements\r\n"
+                + "The diameter of the largest component is 4\r\n",
+                it.printgraph());
+        assertFuzzyEquals(
+            "|Sleepy| does not exist in the Song database\r\n",
+            it.remove("song", "Sleepy"));
+        assertFuzzyEquals(
+            "|ma rainey| does not exist in the Artist database\r\n",
+            it.remove("artist", "ma rainey"));
+        assertFuzzyEquals(
+            "|Ma Rainey| is removed from the Artist database\r\n",
+            it.remove("artist", "Ma Rainey"));
+        assertFuzzyEquals(
+            "0: |Blind Lemon Jefferson|\r\n"
+                + "7: TOMBSTONE\r\n"
+                + "total artists: 1\r\n",
+                it.print("artist"));
+        assertFuzzyEquals(
+            "|Barenaked Ladies| is added to the Artist database\r\n"
+                + "|Sarah Yellin| is added to the Song database\r\n",
+                it.insert("Barenaked Ladies", "Sarah Yellin"));
+        assertFuzzyEquals(
+            "|Gerard Lenorman| is added to the Artist database\r\n"
+                + "Graph size doubled to 20\r\n"
+                + "|Oversleeping| is added to the Song database",
+                it.insert("Gerard Lenorman", "Oversleeping"));
+        assertTrue(it.clear());
     }
     
     /**
@@ -229,24 +229,25 @@ extends TestCase
     
     public void testHash() throws Exception {
         Graph graph = new Graph(10);
-        Hash hash = new Hash("Test", 4, graph);
-        int[] arr = {1,1,1,1};
+        Hash hash = new Hash("song", 4, graph);
+        int[] arr = {-1,-1,-1,-1};
         
         assertFuzzyEquals(Arrays.toString(arr), Arrays.toString(hash.getTable()));
-        assertFuzzyEquals("", hash.insert("a", 0));
-        assertFuzzyEquals("", hash.insert("b", 1));
+        assertFuzzyEquals("a is added to the song database", hash.insert("a", 0));
+        assertFuzzyEquals("b is added to the song database", hash.insert("b", 1));
         
         // testing tombstones
         it = new GraphDB();
         it.create(2);
         assertFuzzyEquals("a is added to the artist database\r\n"
             + "a is added to the song database", it.insert("A","A"));
-        assertFuzzyEquals("Success", it.remove("song", "A"));
-        assertFuzzyEquals("Success", it.remove("artist", "A"));
-//        assertFuzzyEquals("a is added to the artist database\r\n"
-//            + "a is added to the song database", it.insert("A","A"));
+        assertFuzzyEquals("a is removed from the song database", it.remove("song", "A"));
+        assertFuzzyEquals("a is removed from the artist database", it.remove("artist", "A"));
+        assertFuzzyEquals("|a| does not exist in the song database", it.remove("song", "A"));
+        assertFuzzyEquals("|a| does not exist in the artist database", it.remove("artist", "A"));
+        assertFuzzyEquals("a is added to the artist database\r\n"
+            + "a is added to the song database", it.insert("A","A"));
         
-        hash.get("");
     }
     
     public void testGraphDB() throws Exception {
@@ -259,9 +260,11 @@ extends TestCase
         
         assertFuzzyEquals("a is added to the artist database\r\n"
             + "a is added to the song database", it.insert("A","A"));
-        assertFuzzyEquals("Success", it.remove("song", "A"));
+        assertFuzzyEquals("a is removed from the song database", it.remove("song", "A"));
         
-        assertFuzzyEquals(null, it.printgraph());
+        assertFuzzyEquals("there are 1 connected components\r\n"
+            + "the largest connected component has 1 elements\r\n"
+            + "the diameter of the largest component is 0", it.printgraph());
     }
     
     public void testGraph() throws Exception {
@@ -280,11 +283,9 @@ extends TestCase
         
         assertFuzzyEquals("", Arrays.toString(graph.neighbors(1)));
         
-        assertFuzzyEquals(Integer.toString(3), Integer.toString(graph.getIslands()));
         graph.setValue(0, "yeah");
         graph.setValue(1, "nah");
         graph.addEdge(0, 1, 1);
-        assertFuzzyEquals(Integer.toString(2), Integer.toString(graph.getIslands()));
         
         graph.addEdge(1, 0, 1);
         graph.addEdge(1, 0, 0);
@@ -305,7 +306,37 @@ extends TestCase
         graph.addEdge(0, 3, 1);
         graph.addEdge(0, 0, 1);
         
-        graph = new Graph(3);
+        graph = new Graph(5);
         assertFuzzyEquals("", Arrays.toString(graph.neighbors(0)));
+        graph.addEdge(0, 1, 1);
+        graph.addEdge(1, 2, 1);
+        graph.removeEdge(0, 0);
+        graph.addEdge(2, 3, 1);
+        graph.removeEdge(2, 3);
+        
+        assertFuzzyEquals(Integer.toString(2), Integer.toString(graph.edgeCount()));
+        assertFuzzyEquals(Integer.toString(1), Integer.toString(graph.weight(0, 1)));
+        assertFuzzyEquals(Integer.toString(0), Integer.toString(graph.weight(0, 0)));
+        assertFuzzyEquals(Integer.toString(0), Integer.toString(graph.weight(0, 10)));
+        assertFuzzyEquals("graph size doubled to 10", graph.expandGraph());
+        assertFuzzyEquals("", graph.getMessage());
+        assertFuzzyEquals(Integer.toString(2), Integer.toString(graph.edgeCount()));
+        
+        graph = new Graph(2);
+        assertFuzzyEquals(Integer.toString(0), Integer.toString(graph.addNode("a")));
+        assertFuzzyEquals(Integer.toString(1), Integer.toString(graph.addNode("a")));
+        assertFuzzyEquals(Integer.toString(2), Integer.toString(graph.addNode("a")));
+        graph.removeNode(0);
+        assertFuzzyEquals(Integer.toString(0), Integer.toString(graph.addNode("a")));
+        assertFuzzyEquals(Boolean.toString(false), Boolean.toString(graph.hasEdge(0, 1)));
+        graph.addEdge(0, 1, 1);
+        assertFuzzyEquals(Boolean.toString(true), Boolean.toString(graph.hasEdge(0, 1)));
+        assertFuzzyEquals("there are 2 connected components\r\n"
+            + "the largest connected component has 2 elements\r\n"
+            + "the diameter of the largest component is 1", graph.getGraphInfo(new ParPtrTree(10)));
+        assertFuzzyEquals(Integer.toString(3), Integer.toString(graph.getNumEntries()));
+        assertFuzzyEquals(Integer.toString(1), Integer.toString(graph.edgeCount()));
+        assertFuzzyEquals(Integer.toString(0), Integer.toString(graph.freeCount()));
+        
     }
 }
