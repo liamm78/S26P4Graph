@@ -1,4 +1,4 @@
-//package S26P4Graph;
+// package S26P4Graph;
 
 /**
  * Implement a hash table.
@@ -151,7 +151,8 @@ public class Hash {
      * Returns -1 if entry not found
      * 
      * @param s
-     * @return
+     *            String to fetch the graph node that contains it
+     * @return Graph Node idx the string belongs to. -1 if it isn't contained.
      */
     public int get(String s) {
         int possibleSpot = -1;
@@ -185,7 +186,7 @@ public class Hash {
     public String remove(int idx, String s) {
         int currVal = this.hash[idx];
         hash[idx] = TOMBSTONE;
-                // Remove from graph
+        // Remove from graph
         graph.removeNode(currVal);
         occupiedRecords--;
         return "|" + s + "| is removed from the " + name + " database";

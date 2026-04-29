@@ -229,7 +229,7 @@ public class GraphDB implements GPInterface {
      * @return The string that was printed
      */
     public String printgraph() {
-        ParPtrTree tree = new ParPtrTree(10);
+        ParPtrTree tree = new ParPtrTree(graph.nodeCount());
 
         return graph.getGraphInfo(tree);
 

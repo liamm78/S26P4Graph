@@ -1,9 +1,10 @@
-//package S26P4Graph;
+// package S26P4Graph;
 
 public class Graph {
 
-    private class Edge { // Doubly linked list node
-        int vertex, weight;
+    class Edge { // Doubly linked list node
+        int vertex;
+        int weight;
         Edge prev, next;
 
         Edge(int v, int w, Edge p, Edge n) {
@@ -28,7 +29,12 @@ public class Graph {
     }
 
 
-    // Initialize the graph with n vertices
+    /**
+     * Initialize the graph with n nodes/vertices
+     * 
+     * @param n
+     *            Number of nodes to initialize
+     */
     public void init(int n) {
         this.nodeArray = new Edge[n];
         // List headers;
@@ -43,35 +49,56 @@ public class Graph {
     }
 
 
-    // Return the number of vertices
+    /**
+     * Return the current number of nodes
+     * 
+     * @return current number of nodes
+     */
     public int nodeCount() {
         return nodeArray.length;
     }
 
 
-    // Return the current number of edges
+    /**
+     * Return the current number of edges
+     * 
+     * @return current number of edges
+     */
     public int edgeCount() {
         return numEdge;
     }
 
 
-    // Get the value of node with index v
+    /**
+     * Get the value of node with index v
+     * 
+     * @param v
+     *            Node idx
+     * @return Value of the node
+     */
     public Object getValue(int v) {
         return nodeValues[v];
     }
-    
-    // Return the current number of free spots
+
+
+    /**
+     * Return the current number of free spots
+     * 
+     * @return number of free spots
+     */
     public int freeCount() {
         return freeCount;
     }
 
 
     /**
-     * Adding a node in the graph
+     * Setting a value for a node in the graph
      * 
      * 
      * @param v
+     *            Node to set the value for
      * @param val
+     *            The value to set
      */
     public void setValue(int v, Object val) {
         nodeValues[v] = val;
@@ -81,14 +108,14 @@ public class Graph {
     /**
      * Return the link in v's neighbor list that preceeds the
      * // one with w (or where it would be)
-     * ///
-     * ///
      * 
      * @param v
+     *            Node 1
      * @param w
-     * @return
+     *            Node 2
+     * @return The edge we found that connects v and w.
      */
-    private Edge find(int v, int w) {
+    public Edge find(int v, int w) {
         Edge curr = nodeArray[v]; // Begins at head
         // Stop until the neighbor list ends, or the node we want to connect is
         // already connected
@@ -105,30 +132,43 @@ public class Graph {
      * If node is not connected, link curr.next to our new node.
      * 
      * @param v
+     *            Node 1
      * @param w
+     *            Node 2
      * @param wgt
+     *            Weight of edge
      */
     public void addEdge(int v, int w, int wgt) {
         if (wgt == 0) {
             return;
         }
         Edge curr = find(v, w);
-        if (curr.next != null) {
-            if(curr.next.vertex == w) {
-                curr.next.weight = wgt;
-            }
+        // 1. Edge already exists: Update weight
+        if (curr.next != null && curr.next.vertex == w) {
+            curr.next.weight = wgt;
         }
+        // 2. Edge does not exist: Create new edge between curr and curr.next
         else {
-            curr.next = new Edge(w, wgt, curr, curr.next);
-            numEdge++;
-            if (curr.next.next != null) {
-                curr.next.next.prev = curr.next;
+            Edge newEdge = new Edge(w, wgt, curr, curr.next);
+            // Edge is in the middle
+            if (curr.next != null) {
+                curr.next.prev = newEdge;
             }
+            curr.next = newEdge;
+            numEdge++;
         }
     }
 
 
-    // Get the weight value for an edge
+    /**
+     * Find weight value for an edge between v and w.
+     * 
+     * @param v
+     *            Node 1
+     * @param w
+     *            Node 2
+     * @return Edge's weight value. 0 if no edge exists
+     */
     public int weight(int v, int w) {
         Edge curr = find(v, w);
         if ((curr.next == null) || (curr.next.vertex != w)) {
@@ -141,55 +181,67 @@ public class Graph {
 
 
     /**
-     * Called when numEntries is full.
+     * Called when numEntries is full. Creates a copy of a new graph
+     * double the current node size
+     * and copies everything over
      * 
      * 
+     * @return Graph expansion string
      */
     public String expandGraph() {
         int newSize = nodeArray.length * 2;
         Edge[] newNodeArray = new Edge[newSize];
         Object[] newNodeValues = new Object[newSize];
         int[] newFreeEntries = new int[newSize];
-        
+
         // Blank slate
         for (int i = 0; i < newSize; i++) {
             newNodeArray[i] = new Edge(-1, -1, null, null);
         }
         for (int i = 0; i < nodeArray.length; i++) {
             newNodeArray[i] = nodeArray[i];
-            newNodeValues[i]= nodeValues[i];
+            newNodeValues[i] = nodeValues[i];
         }
         // Copy over free slots
         for (int i = 0; i < freeEntries.length; i++) {
             newFreeEntries[i] = freeEntries[i];
         }
-        
+
         this.nodeArray = newNodeArray;
         this.nodeValues = newNodeValues;
         this.freeEntries = newFreeEntries;
-        
-        return "Graph size doubled to "+newSize+"\r\n";
+
+        return "Graph size doubled to " + newSize + "\r\n";
     }
 
-    
+
+    /**
+     * Used for fetching any messages not returned from the method (ie.
+     * expandGraph)
+     * 
+     * @return last message logged
+     */
     public String getMessage() {
         return this.lastMessage;
     }
 
+
     /**
-     * Check if there is a free spot, and use the
+     * Check if there is a free spot, and add a node in that position if its
+     * free. Otherwise, try to insert at numEntries. If the graph is full,
+     * expand it
      * 
      * 
      * @param v
+     *            Node that was added
      */
     public int addNode(String value) {
         int node = 0;
-        // There is a free spot
+        lastMessage = "";
         if (freeCount > 0) {
             freeCount--;
             node = freeEntries[freeCount];
         }
-        // Otherwise, try to insert at numEntries. but check if graph is full
         else {
             if (numEntries >= nodeArray.length) {
                 lastMessage = expandGraph();
@@ -203,6 +255,12 @@ public class Graph {
     }
 
 
+    /**
+     * Removes a node from a graph
+     * 
+     * @param v
+     *            Node to remove
+     */
     public void removeNode(int v) {
 
         // Remove edges going out from v
@@ -214,7 +272,7 @@ public class Graph {
         nodeArray[v].next = null;
         // Remove edges coming into v
         for (int i = 0; i < nodeArray.length; i++) {
-            if (i == v) {
+            if (i != v) {
                 removeEdge(i, v);
             }
         }
@@ -225,18 +283,25 @@ public class Graph {
     }
 
 
-    // Removes the edge from the graph.
+    /**
+     * Removes the edge from a graph
+     * 
+     * @param v
+     *            Node 1
+     * @param w
+     *            Node 2
+     */
     public void removeEdge(int v, int w) {
         Edge curr = find(v, w);
         if (curr.next == null) {
             return;
         }
-        if(curr.next.vertex != w) {
+        if (curr.next.vertex != w) {
             return;
         }
         else {
             curr.next = curr.next.next;
-            if (curr.next != null) {
+            if (curr.next != null) { // middle
                 curr.next.prev = curr;
             }
         }
@@ -244,13 +309,27 @@ public class Graph {
     }
 
 
-    // Returns true iff the graph has the edge
+    /**
+     * Returns true if the graph has an edge v, w
+     * 
+     * @param v
+     *            Node 1
+     * @param w
+     *            Node 2
+     * @return If the edge containing v, w exists
+     */
     public boolean hasEdge(int v, int w) {
         return weight(v, w) != 0;
     }
 
 
-    // Returns an array containing the indicies of the neighbors of v
+    /**
+     * Returns an array containing the indicies of the neighbors of v
+     * 
+     * @param v
+     *            Node we want to find neighbors for
+     * @return Neighbors of node v in an array
+     */
     public int[] neighbors(int v) {
         int cnt = 0;
         Edge curr;
@@ -269,10 +348,13 @@ public class Graph {
     /**
      * Uses Disjoint Set Union to find islands
      * 
-     * @return
+     * @return String that contains the number of connected components, how many
+     *         elements the largest connected component has, and the diameter of
+     *         it
      */
-    public String getGraphInfo(ParPtrTree ptr) {
-        ParPtrTree tree = ptr;
+    public String getGraphInfo(ParPtrTree t) {
+        ParPtrTree tree = t;
+
         int[] sizes = new int[nodeArray.length]; //
         int maxCount = 0; // Max nodes for any islands
         int numIslands = 0;
@@ -300,9 +382,6 @@ public class Graph {
                 }
             }
         }
-        for (int i = 0; i < sizes.length; i++) {
-            System.out.println(sizes[i]);
-        }
         // Get num islands
         for (int i = 0; i < sizes.length; i++) {
             if (sizes[i] > 0) {
@@ -313,8 +392,6 @@ public class Graph {
         int maxDiameter = 0;
         for (int i = 0; i < sizes.length; i++) {
             if (sizes[i] == maxCount) { // Check if this node leads to root i
-                System.out.println("New root " + i);
-
                 int[] currentIsland = new int[maxCount];
                 int c = 0;
                 for (int j = 0; j < nodeArray.length; j++) {
@@ -343,8 +420,8 @@ public class Graph {
      * Computes diameter
      * 
      * @param nodes
-     *            that are apart of this island
-     * @return
+     *            Nodes that are apart of this island
+     * @return Diameter computed from Floyds
      */
     public int computeDiameter(int[] nodes) {
         int n = nodes.length;
@@ -367,12 +444,6 @@ public class Graph {
                 }
             }
         }
-        System.out.println("D before floyds");
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                System.out.println(D[i][j]);
-            }
-        }
         for (int k = 0; k < n; k++) { // Compute all k paths
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
@@ -382,13 +453,6 @@ public class Graph {
                         D[i][j] = D[i][k] + D[k][j];
                     }
                 }
-            }
-        }
-        System.out.println("D after floyds");
-
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                System.out.println(D[i][j]);
             }
         }
 
@@ -404,6 +468,11 @@ public class Graph {
     }
 
 
+    /**
+     * Return number of current entries in graph
+     * 
+     * @return entires in Graph
+     */
     public int getNumEntries() {
         return numEntries;
     }
