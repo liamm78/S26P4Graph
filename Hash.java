@@ -6,8 +6,8 @@
  * Hash function: sfold
  * Collision Resolution: Quadratic probing
  *
- * @author <Your name(s) here
- * @version <Put something here>
+ * @author Liam Murphy and Collin
+ * @version v1
  */
 
 public class Hash {
@@ -27,6 +27,8 @@ public class Hash {
      *            String for the table name
      * @param isize
      *            The initial size (and increment size) for the table
+     * @param graph
+     *            Graph associated with the Hash table
      */
     public Hash(String n, int isize, Graph graph) {
         this.hash = new int[isize]; // Create an array of ints (node_ids
@@ -39,11 +41,21 @@ public class Hash {
     }
 
 
+    /**
+     * Return the current hash table
+     * 
+     * @return Hash table int[]
+     */
     public int[] getTable() {
         return hash;
     }
 
 
+    /**
+     * Expand the hash table if occupied records is above half.
+     * 
+     * @return String pertaining if the hash table size doubled.
+     */
     public String expandHash() {
         int newHashSize = hashSize * 2;
         int[] newHash = new int[newHashSize];
@@ -93,9 +105,11 @@ public class Hash {
      * // assign the Handle to that index.
      * ///
      * Insert the expansion once more than half of the hash table is full.
-     * ///
      * 
      * @param s
+     *            String to insert
+     * @param nodeId
+     *            Node idx to insert
      * @return Result of insertion
      */
     public String insert(String s, int nodeId) {
@@ -138,7 +152,6 @@ public class Hash {
         else if (name.equals("artist")) {
             str += "|" + s + "| is added to the Artist database\r\n";
         }
-        // doubling + adding
         return str;
     }
 
@@ -183,6 +196,18 @@ public class Hash {
     }
 
 
+    /**
+     * Removes a string from a hash table.
+     * Reuses get() method to fetch the node index to remove.
+     * No need to check for duplicates as get() handles that for us
+     * Removes on both the hash table and graph, and decreses records
+     * 
+     * @param idx
+     *            Node index to remove
+     * @param s
+     *            String to remove
+     * @return String that was removed
+     */
     public String remove(int idx, String s) {
         int currVal = this.hash[idx];
         hash[idx] = TOMBSTONE;
@@ -193,11 +218,21 @@ public class Hash {
     }
 
 
+    /**
+     * Returs the hash table size
+     * 
+     * @return Hash table size
+     */
     public int getHashSize() {
         return this.hashSize;
     }
 
 
+    /**
+     * Returns the number of occupied records
+     * 
+     * @return Occupied records amount
+     */
     public int getOccupiedRecords() {
         return this.occupiedRecords;
     }

@@ -1,33 +1,52 @@
-//package S26P4Graph;
-
+// package S26P4Graph;
 
 public class ParPtrTree {
     // Data structure for handling parent relationships/root finding
-    
-    
-  private int[] array;     // Parent ptr array. 
 
-  ParPtrTree(int size) {
-    array = new int[size]; // Create node array
-    for (int i=0; i<size; i++) {
-      array[i] = -1;       // Each node is its own root to start
-    }
-  }
+    private int[] array; // Parent ptr array.
 
-  // Merge two subtrees if they are different
-  public void UNION(int a, int b) {
-    int root1 = FIND(a);     // Find root of node a
-    int root2 = FIND(b);     // Find root of node b
-    if (root1 != root2) {          // Merge two trees
-      array[root1] = root2;
+    /**
+     * Class to manage parent pointer relationships between the graph
+     * 
+     * @param size
+     *            Amount of nodes in graph
+     */
+    ParPtrTree(int size) {
+        array = new int[size]; // Create node array
+        for (int i = 0; i < size; i++) {
+            array[i] = -1; // Each node is its own root to start
+        }
     }
-  }
 
-  // Return the root of curr's tree
-  public int FIND(int curr) {
-    while (array[curr] != -1) {
-      curr = array[curr];
+
+    /**
+     * Merge two subtrees if they are different
+     * 
+     * @param a
+     *            Node A to merge
+     * @param b
+     *            Node B to merge
+     */
+    public void UNION(int a, int b) {
+        int root1 = FIND(a); // Find root of node a
+        int root2 = FIND(b); // Find root of node b
+        if (root1 != root2) { // Merge two trees
+            array[root1] = root2;
+        }
     }
-    return curr; // Now at root
-  }
+
+
+    /**
+     * Return root of current tree
+     * 
+     * @param curr
+     *            Root to find
+     * @return Root found
+     */
+    public int FIND(int curr) {
+        while (array[curr] != -1) {
+            curr = array[curr];
+        }
+        return curr; // Now at root
+    }
 }

@@ -177,6 +177,12 @@ public class GraphProjTest extends TestCase {
     }
 
 
+    /**
+     * Tests general hash table inserts, removals, and some edge cases.
+     * More defined in HashTest
+     * 
+     * @throws Exception
+     */
     public void testHash() throws Exception {
         Graph graph = new Graph(10);
         Hash hash = new Hash("song", 4, graph);
@@ -208,6 +214,11 @@ public class GraphProjTest extends TestCase {
     }
 
 
+    /**
+     * Tests general GraphDB functions
+     * 
+     * @throws Exception
+     */
     public void testGraphDB() throws Exception {
         it = new GraphDB();
         it.create(2);
@@ -227,6 +238,11 @@ public class GraphProjTest extends TestCase {
     }
 
 
+    /**
+     * Tests graph specific functions with more detail
+     * 
+     * @throws Exception
+     */
     public void testGraph() throws Exception {
         Graph graph = new Graph(3);
 
@@ -316,6 +332,11 @@ public class GraphProjTest extends TestCase {
     }
 
 
+    /**
+     * Tests addEdge mutations
+     * 
+     * @throws Exception
+     */
     public void testGraph2() throws Exception {
         Graph g = new Graph(3);
         // Test null edge
@@ -334,6 +355,11 @@ public class GraphProjTest extends TestCase {
     }
 
 
+    /**
+     * Tests removeNode mutations
+     * 
+     * @throws Exception
+     */
     public void testRemoveNode() throws Exception {
         Graph g = new Graph(3);
 
@@ -370,6 +396,10 @@ public class GraphProjTest extends TestCase {
     }
 
 
+    /**
+     * Tests neighbors mutations
+     * 
+     */
     public void testNeighbors() {
         Graph g = new Graph(4);
         g.addEdge(1, 0, 5);
@@ -383,9 +413,12 @@ public class GraphProjTest extends TestCase {
     }
 
 
+    /**
+     * Tests addEdge and removeEdge mutations
+     * 
+     * @throws Exception
+     */
     public void testPrevPointers() throws Exception {
-        // Kills line 293 mutation (if curr.next != null → if false in
-        // removeEdge):
         Graph g = new Graph(5);
         g.addEdge(0, 1, 1);
         g.addEdge(0, 3, 1);
@@ -394,11 +427,10 @@ public class GraphProjTest extends TestCase {
                                             // 3)
         assertSame(sentinel, sentinel.next.prev);
 
-        // Kills line 154 mutation (if curr.next != null → if false in addEdge):
         g = new Graph(5);
         g.addEdge(0, 1, 1);
         g.addEdge(0, 3, 1);
-        g.addEdge(0, 2, 1); // inserts between 1 and 3
+        g.addEdge(0, 2, 1); // inserts between 1 and 3 in nodeArray (middle)
         Graph.Edge edge2 = g.find(0, 3); // returns Edge(2) (predecessor of 3)
         assertSame(edge2, edge2.next.prev);
     }

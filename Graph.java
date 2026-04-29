@@ -3,10 +3,36 @@
 public class Graph {
 
     class Edge { // Doubly linked list node
+        /**
+         * Current vertex
+         */
         int vertex;
+        /**
+         * Current weight of the edge
+         */
         int weight;
-        Edge prev, next;
+        /**
+         * Previous edge
+         */
+        Edge prev;
+        /**
+         * Next edge
+         */
+        Edge next;
 
+        /**
+         * Doubly linked list that defines an edge (prev, next) ptrs, and weight
+         * assigned
+         * 
+         * @param v
+         *            node for the edge
+         * @param w
+         *            weight for the egde
+         * @param p
+         *            prev Edge
+         * @param n
+         *            next Edge
+         */
         Edge(int v, int w, Edge p, Edge n) {
             vertex = v;
             weight = w;
@@ -227,13 +253,16 @@ public class Graph {
 
 
     /**
+     * Finds which node idx to insert the string at
      * Check if there is a free spot, and add a node in that position if its
      * free. Otherwise, try to insert at numEntries. If the graph is full,
      * expand it
      * 
      * 
-     * @param v
-     *            Node that was added
+     * @param value
+     *            String to insert
+     * @return node idx the string was inserted at
+     * 
      */
     public int addNode(String value) {
         int node = 0;
@@ -348,6 +377,9 @@ public class Graph {
     /**
      * Uses Disjoint Set Union to find islands
      * 
+     * @param t
+     *            ParPtrTree object we store the components in
+     * 
      * @return String that contains the number of connected components, how many
      *         elements the largest connected component has, and the diameter of
      *         it
@@ -425,32 +457,32 @@ public class Graph {
      */
     public int computeDiameter(int[] nodes) {
         int n = nodes.length;
-        int[][] D = new int[n][n];
-        Graph G = this;
+        int[][] dMat = new int[n][n];
+        Graph gMat = this;
 
         for (int i = 0; i < n; i++) { // Initialize D with weights
             for (int j = 0; j < n; j++) {
                 if (i != j) {
-                    int w = G.weight(nodes[i], nodes[j]);
+                    int w = gMat.weight(nodes[i], nodes[j]);
                     if (w != 0) {
-                        D[i][j] = 1; // all edges have a weight of one
+                        dMat[i][j] = 1; // all edges have a weight of one
                     }
                     else {
-                        D[i][j] = Integer.MAX_VALUE;
+                        dMat[i][j] = Integer.MAX_VALUE;
                     }
                 }
                 else {
-                    D[i][j] = 0;
+                    dMat[i][j] = 0;
                 }
             }
         }
         for (int k = 0; k < n; k++) { // Compute all k paths
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
-                    if ((D[i][k] != Integer.MAX_VALUE)
-                        && (D[k][j] != Integer.MAX_VALUE) && (D[i][j] > (D[i][k]
-                            + D[k][j]))) {
-                        D[i][j] = D[i][k] + D[k][j];
+                    if ((dMat[i][k] != Integer.MAX_VALUE)
+                        && (dMat[k][j] != Integer.MAX_VALUE)
+                        && (dMat[i][j] > (dMat[i][k] + dMat[k][j]))) {
+                        dMat[i][j] = dMat[i][k] + dMat[k][j];
                     }
                 }
             }
@@ -459,8 +491,8 @@ public class Graph {
         int diameter = 0;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                if (D[i][j] != Integer.MAX_VALUE && D[i][j] > diameter) {
-                    diameter = D[i][j];
+                if (dMat[i][j] != Integer.MAX_VALUE && dMat[i][j] > diameter) {
+                    diameter = dMat[i][j];
                 }
             }
         }
