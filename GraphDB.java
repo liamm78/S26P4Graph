@@ -1,4 +1,4 @@
-//package S26P4Graph;
+// package S26P4Graph;
 
 import java.io.IOException;
 
@@ -159,7 +159,7 @@ public class GraphDB implements GPInterface {
             table = artistTable;
             s = "Artist";
         }
-        else if (type.equals("song")) {
+        else {
             table = songTable;
             s = "Song";
         }
@@ -202,7 +202,7 @@ public class GraphDB implements GPInterface {
         if (type.equals("artist")) {
             table = artistTable;
         }
-        else if (type.equals("song")) {
+        else {
             table = songTable;
         }
 

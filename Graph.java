@@ -301,9 +301,10 @@ public class Graph {
         nodeArray[v].next = null;
         // Remove edges coming into v
         for (int i = 0; i < nodeArray.length; i++) {
-            if (i != v) {
-                removeEdge(i, v);
-            }
+            removeEdge(i, v);
+// if (i != v) {
+// removeEdge(i, v);
+// }
         }
         freeEntries[freeCount] = v;
         freeCount++;
@@ -397,16 +398,17 @@ public class Graph {
             while (curr != null) {
                 int v = i;
                 int w = curr.vertex;
-                if (tree.FIND(v) != tree.FIND(w)) {
-                    tree.UNION(v, w);
-                }
+                tree.union(v, w);
+// if (tree.FIND(v) != tree.FIND(w)) {
+// tree.UNION(v, w);
+// }
                 curr = curr.next;
             }
         }
 
         for (int i = 0; i < nodeArray.length; i++) {
             if (getValue(i) != null) {
-                int root = tree.FIND(i);
+                int root = tree.find(i);
                 sizes[root]++;
 
                 if (sizes[root] > maxCount) {
@@ -423,21 +425,21 @@ public class Graph {
         // Run Floyd on every root to see the max diameters
         int maxDiameter = 0;
         for (int i = 0; i < sizes.length; i++) {
-            if (sizes[i] == maxCount) { // Check if this node leads to root i
-                int[] currentIsland = new int[maxCount];
-                int c = 0;
-                for (int j = 0; j < nodeArray.length; j++) {
-                    if (getValue(j) != null && tree.FIND(j) == i) {
-                        currentIsland[c] = j;
-                        c++;
-                    }
+// if (sizes[i] == maxCount) { // Check if this node leads to root i
+            int[] currentIsland = new int[maxCount];
+            int c = 0;
+            for (int j = 0; j < nodeArray.length; j++) {
+                if (getValue(j) != null && tree.find(j) == i) {
+                    currentIsland[c] = j;
+                    c++;
                 }
-                int d = computeDiameter(currentIsland);
-                if (d > maxDiameter) {
-                    maxDiameter = d;
-                }
-
             }
+            int d = computeDiameter(currentIsland);
+            if (d > maxDiameter) {
+                maxDiameter = d;
+            }
+
+// }
         }
 
         return "There are " + numIslands + " connected components\r\n"

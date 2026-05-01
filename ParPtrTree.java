@@ -27,9 +27,9 @@ public class ParPtrTree {
      * @param b
      *            Node B to merge
      */
-    public void UNION(int a, int b) {
-        int root1 = FIND(a); // Find root of node a
-        int root2 = FIND(b); // Find root of node b
+    public void union(int a, int b) {
+        int root1 = find(a); // Find root of node a
+        int root2 = find(b); // Find root of node b
         if (root1 != root2) { // Merge two trees
             array[root1] = root2;
         }
@@ -43,7 +43,7 @@ public class ParPtrTree {
      *            Root to find
      * @return Root found
      */
-    public int FIND(int curr) {
+    public int find(int curr) {
         while (array[curr] != -1) {
             curr = array[curr];
         }

@@ -172,8 +172,13 @@ public class GraphProjTest extends TestCase {
     public void testParPtrTree() throws Exception {
         ParPtrTree tree = new ParPtrTree(10);
 
-        assertFuzzyEquals("1", Integer.toString(tree.FIND(1)));
-        tree.UNION(0, 1);
+        assertFuzzyEquals("1", Integer.toString(tree.find(1)));
+        tree.union(0, 1);
+        assertFuzzyEquals("1", Integer.toString(tree.find(0)));
+        assertFuzzyEquals("1", Integer.toString(tree.find(1)));
+        tree.union(0, 0);
+        assertFuzzyEquals("1", Integer.toString(tree.find(0)));
+        assertFuzzyEquals("1", Integer.toString(tree.find(1)));
     }
 
 
@@ -191,9 +196,9 @@ public class GraphProjTest extends TestCase {
         assertFuzzyEquals(Arrays.toString(arr), Arrays.toString(hash
             .getTable()));
         assertFuzzyEquals("a is added to the song database", hash.insert("a",
-            0));
+            graph.addNode("a")));
         assertFuzzyEquals("b is added to the song database", hash.insert("b",
-            1));
+            graph.addNode("b")));
 
         // testing tombstones
         it = new GraphDB();
@@ -211,6 +216,144 @@ public class GraphProjTest extends TestCase {
         assertFuzzyEquals("a is added to the artist database\r\n"
             + "a is added to the song database", it.insert("A", "A"));
 
+        assertFuzzyEquals("graph size doubled to 4\r\n"
+            + "artist hash table size doubled\r\n"
+            + "song is added to the artist database\r\n"
+            + "song hash table size doubled\r\n"
+            + "aa is added to the song database", it.insert("song", "Aa"));
+        assertFuzzyEquals("graph size doubled to 8\r\n"
+            + "song hash table size doubled\r\n"
+            + "bb is added to the song database", it.insert("song", "BB"));
+        assertFuzzyEquals("aaaa is added to the song database", it.insert(
+            "song", "aaaa"));
+
+        Graph graph2 = new Graph(20);
+        Hash hash2 = new Hash("song", 5, graph2);
+
+        int id1 = graph2.addNode("Aa");
+        int id2 = graph2.addNode("BB");
+        int id3 = graph2.addNode("AaAa");
+        int id4 = graph2.addNode("BbBb");
+        hash2.insert("Aa", id1);
+        hash2.insert("BB", id2);
+        hash2.insert("AaAa", id3);
+        hash2.insert("BbBb", id4);
+        int pos1 = hash2.get("Aa");
+        int pos2 = hash2.get("BB");
+        int pos3 = hash2.get("AaAa");
+        int pos4 = hash2.get("BbBb");
+        assertTrue(pos1 != pos2);
+        assertTrue(pos2 != pos3);
+        assertTrue(pos1 != pos3);
+        assertTrue(pos1 != pos4);
+        assertTrue(pos1 != -1);
+        assertTrue(pos2 != -1);
+        assertTrue(pos3 != -1);
+        assertTrue(pos4 != -1);
+
+        graph2 = new Graph(20);
+        hash2 = new Hash("song", 4, graph2);
+        String[] vals = { "Aa", "BB", "AaAa", "BBBB", "AaBB" };
+        for (String s : vals) {
+            int id = graph2.addNode(s);
+            hash2.insert(s, id);
+        }
+        assertTrue(hash2.getHashSize() > 4);
+        for (String s : vals) {
+            assertTrue(hash2.get(s) != -1);
+        }
+
+        graph2 = new Graph(50);
+        hash2 = new Hash("song", 3, graph2);
+        hash2.insert("1", graph2.addNode("1"));
+        hash2.insert("2", graph2.addNode("2"));
+        hash2.insert("3", graph2.addNode("3"));
+        hash2.insert("4", graph2.addNode("4"));
+        assertTrue(hash2.get("4") != -1);
+
+        graph2 = new Graph(50);
+        hash2 = new Hash("song", 3, graph2);
+        id1 = graph2.addNode("A");
+        id2 = graph2.addNode("B");
+        hash2.insert("A", id1);
+        pos1 = hash2.get("A");
+        hash2.remove(pos1, "A");
+        hash2.insert("B", id2);
+        pos2 = hash2.get("B");
+        assertTrue(pos2 != -1);
+
+        graph2 = new Graph(10);
+        hash2 = new Hash("song", 5, graph2);
+        id1 = graph2.addNode("Aa");
+        id2 = graph2.addNode("BB");
+        hash2.insert("Aa", id1);
+        hash2.insert("BB", id2);
+        assertFuzzyEquals("Duplicate", hash2.insert("Aa", id1));
+
+        graph2 = new Graph(10);
+        hash2 = new Hash("song", 5, graph2);
+        String[] vals2 = { "Aa", "BB", "AaAa", "BBBB" };
+        for (String s : vals2) {
+            hash2.insert(s, graph2.addNode(s));
+        }
+        for (String s : vals2) {
+            assertTrue(hash2.get(s) != -1);
+        }
+
+        Graph g = new Graph(10);
+        Hash h = new Hash("song", 7, g);
+        id1 = g.addNode("Aa");
+        id2 = g.addNode("BB");
+        h.insert("Aa", id1);
+        h.insert("BB", id2);
+        pos1 = h.get("Aa");
+        pos2 = h.get("BB");
+        assertTrue(pos1 != pos2);
+        assertTrue(Math.abs(pos1 - pos2) != 1);
+
+        assertEquals(7, h.getHashSize());
+
+        g = new Graph(10);
+        h = new Hash("song", 5, g);
+        id1 = g.addNode("Aa");
+        id2 = g.addNode("BB");
+        id3 = g.addNode("AaAa");
+        h.insert("Aa", id1);
+        h.insert("BB", id2);
+        pos1 = h.get("Aa");
+        h.remove(pos1, "Aa");
+        h.insert("AaAa", id3);
+        pos3 = h.get("AaAa");
+        assertTrue(pos3 > -1);
+        assertTrue(h.get("BB") != -1);
+
+        assertEquals(5, h.getHashSize());
+
+        g = new Graph(10);
+        h = new Hash("song", 3, g);
+        String[] vals3 = { "Aa", "BB", "AaAa", "BBBB", "AaBB" };
+        for (String s : vals3) {
+            h.insert(s, g.addNode(s));
+        }
+        for (String s : vals3) {
+            assertTrue("Missing: " + s, h.get(s) != -1);
+        }
+
+        assertEquals(12, h.getHashSize());
+
+        h = new Hash("song", 100, new Graph(10));
+        int h1 = h.h("abcd", 100);
+        int h2 = h.h("abce", 100);
+        int h3 = h.h("abcde", 100);
+        assertTrue(h1 != h2);
+        assertTrue(h2 != h3);
+
+        g = new Graph(10);
+        Hash artistHash = new Hash("artist", 5, g);
+        String res = artistHash.insert("Drake", g.addNode("Drake"));
+        assertTrue(res.contains("Artist"));
+
+        assertEquals(100, h.getHashSize());
     }
 
 
@@ -235,6 +378,17 @@ public class GraphProjTest extends TestCase {
         assertFuzzyEquals("there are 1 connected components\r\n"
             + "the largest connected component has 1 elements\r\n"
             + "the diameter of the largest component is 0", it.printgraph());
+
+        it = new GraphDB();
+        it.create(0);
+        assertFalse(it.clear());
+
+        it = new GraphDB();
+        it.create(10);
+        it.insert("john music", "john song");
+        assertFuzzyEquals("not john music is added to the artist database", it
+            .insert("not john music", "john song"));
+
     }
 
 
@@ -329,6 +483,43 @@ public class GraphProjTest extends TestCase {
         assertFuzzyEquals(Integer.toString(0), Integer.toString(graph
             .freeCount()));
 
+        graph = new Graph(3);
+        int node = graph.addNode("0");
+        graph.addEdge(0, 1, 1);
+        graph.addEdge(1, 0, 1);
+        graph.addEdge(1, 2, 1);
+        graph.addEdge(2, 1, 1);
+        graph.removeNode(node);
+        assertEquals(3, graph.nodeCount());
+
+        graph = new Graph(3);
+        graph.addEdge(1, 1, 5);
+        assertEquals(1, graph.edgeCount());
+        graph.removeNode(1);
+        assertEquals(0, graph.edgeCount());
+
+        graph = new Graph(6);
+        graph.setValue(0, "A");
+        graph.setValue(1, "B");
+        graph.setValue(2, "C");
+        graph.setValue(3, "D");
+        graph.addEdge(0, 1, 1);
+        graph.addEdge(2, 3, 1);
+        String res = graph.getGraphInfo(new ParPtrTree(10));
+        assertTrue(res.contains("There are 2 connected components"));
+        assertTrue(res.contains("has 2 elements"));
+
+        graph = new Graph(6);
+        for (int i = 0; i < 6; i++) {
+            graph.setValue(i, "" + i);
+        }
+        graph.addEdge(0, 1, 1);
+        graph.addEdge(1, 2, 1);
+        graph.addEdge(3, 4, 1);
+        graph.addEdge(4, 5, 1);
+        graph.addEdge(5, 3, 1);
+        res = graph.getGraphInfo(new ParPtrTree(10));
+        assertTrue(res.contains("diameter"));
     }
 
 

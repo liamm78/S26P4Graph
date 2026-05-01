@@ -180,9 +180,9 @@ public class Hash {
             if (currVal == EMPTY) {
                 return -1;
             }
-            else if (currVal == TOMBSTONE) {
-                if (possibleSpot == -1) // If first pass
-                    possibleSpot = pos;
+            else if (currVal == TOMBSTONE && possibleSpot == -1) {
+// if () // If first pass
+                possibleSpot = pos;
             }
             else {
                 String graphVal = (String)graph.getValue(currVal);

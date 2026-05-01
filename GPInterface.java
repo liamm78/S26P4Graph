@@ -1,4 +1,4 @@
-//package S26P4Graph;
+// package S26P4Graph;
 
 import java.io.IOException;
 
@@ -14,7 +14,9 @@ public interface GPInterface {
     // ----------------------------------------------------------
     /**
      * (Re)initialize the database
-     * @param initHash Initial hash table size
+     * 
+     * @param initHash
+     *            Initial hash table size
      * @return Error messages if appropriate
      */
     public String create(int initHash);
@@ -23,6 +25,7 @@ public interface GPInterface {
     // ----------------------------------------------------------
     /**
      * (Re)initialize the database
+     * 
      * @return true on successful clear of database
      */
     public boolean clear();
@@ -67,6 +70,7 @@ public interface GPInterface {
      * @throws IOException
      */
     public String print(String type) throws IOException;
+
 
     // ----------------------------------------------------------
     /**
