@@ -154,7 +154,7 @@ public class Graph {
 
     /**
      * Connects node v to node w
-     * / Find the edge before. If node is connected, update the weight
+     * / find the edge before. If node is connected, update the weight
      * If node is not connected, link curr.next to our new node.
      * 
      * @param v
@@ -187,7 +187,7 @@ public class Graph {
 
 
     /**
-     * Find weight value for an edge between v and w.
+     * find weight value for an edge between v and w.
      * 
      * @param v
      *            Node 1
@@ -253,7 +253,7 @@ public class Graph {
 
 
     /**
-     * Finds which node idx to insert the string at
+     * finds which node idx to insert the string at
      * Check if there is a free spot, and add a node in that position if its
      * free. Otherwise, try to insert at numEntries. If the graph is full,
      * expand it
@@ -375,7 +375,7 @@ public class Graph {
 
 
     /**
-     * Uses Disjoint Set Union to find islands
+     * Uses Disjoint Set union to find islands
      * 
      * @param t
      *            ParPtrTree object we store the components in
@@ -397,8 +397,8 @@ public class Graph {
             while (curr != null) {
                 int v = i;
                 int w = curr.vertex;
-                if (tree.FIND(v) != tree.FIND(w)) {
-                    tree.UNION(v, w);
+                if (tree.find(v) != tree.find(w)) {
+                    tree.union(v, w);
                 }
                 curr = curr.next;
             }
@@ -406,7 +406,7 @@ public class Graph {
 
         for (int i = 0; i < nodeArray.length; i++) {
             if (getValue(i) != null) {
-                int root = tree.FIND(i);
+                int root = tree.find(i);
                 sizes[root]++;
 
                 if (sizes[root] > maxCount) {
@@ -427,7 +427,7 @@ public class Graph {
                 int[] currentIsland = new int[maxCount];
                 int c = 0;
                 for (int j = 0; j < nodeArray.length; j++) {
-                    if (getValue(j) != null && tree.FIND(j) == i) {
+                    if (getValue(j) != null && tree.find(j) == i) {
                         currentIsland[c] = j;
                         c++;
                     }

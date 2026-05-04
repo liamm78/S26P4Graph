@@ -138,6 +138,9 @@ public class Hash {
             }
             else {
                 String graphVal = (String)graph.getValue(currVal);
+                if(graphVal == null) {
+                    return "Duplicate";
+                }
                 if (graphVal.equals(s)) {
                     return "Duplicate";
                 }
@@ -181,8 +184,6 @@ public class Hash {
                 return -1;
             }
             else if (currVal == TOMBSTONE) {
-                if (possibleSpot == -1) // If first pass
-                    possibleSpot = pos;
             }
             else {
                 String graphVal = (String)graph.getValue(currVal);
